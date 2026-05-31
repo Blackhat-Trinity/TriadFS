@@ -1,0 +1,68 @@
+name: triadfs
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: triadfs-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-triadfs}
+      POSTGRES_USER: ${POSTGRES_USER:-triadfs}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-triadfs}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-triadfs} -d ${POSTGRES_DB:-triadfs}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api-server:
+    container_name: triadfs-api
+    build:
+      context: ./backend
+      dockerfile: api-server/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-triadfs}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-triadfs}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-triadfs}
+      TRIADFS_STORAGE_LOCAL_DIR: /app/data/chunks
+      TRIADFS_AUTH_JWT_SECRET_BASE64: ${TRIADFS_AUTH_JWT_SECRET_BASE64:-dHJpYWRmcy1zdXBlci1zZWNyZXQta2V5LWZvci1qd3QtMjAyNg==}
+      JAVA_OPTS: ${JAVA_OPTS:--XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0}
+    ports:
+      - "${API_PORT:-8080}:8080"
+    volumes:
+      - chunkdata:/app/data/chunks
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health | grep -q '\"status\":\"UP\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  pgadmin:
+    image: dpage/pgadmin4:8.14
+    container_name: triadfs-pgadmin
+    restart: unless-stopped
+    profiles: ["tools"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@triadfs.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin123}
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+volumes:
+  pgdata:
+  chunkdata:
+  pgadmin-data:
