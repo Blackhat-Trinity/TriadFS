@@ -1,0 +1,68 @@
+name: Desktop Builds
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+      - ".github/workflows/desktop-builds.yml"
+  pull_request:
+    paths:
+      - "frontend/**"
+      - ".github/workflows/desktop-builds.yml"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact_name: triadfs-windows
+            build_command: npm run desktop:build:win
+            artifact_glob: frontend/release/**
+          - os: macos-latest
+            artifact_name: triadfs-macos
+            build_command: npm run desktop:build:mac
+            artifact_glob: frontend/release/**
+          - os: ubuntu-latest
+            artifact_name: triadfs-linux
+            build_command: npm run desktop:build:linux
+            artifact_glob: frontend/release/**
+
+    runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Linux packaging dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libarchive-tools rpm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build desktop artifacts
+        run: ${{ matrix.build_command }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_glob }}
