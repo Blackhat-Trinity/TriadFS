@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0b1220"/>
+      <stop offset="100%" stop-color="#1d3557"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="700" fill="url(#bg)"/>
+  <rect x="40" y="40" width="1120" height="620" rx="18" fill="#ffffff" opacity="0.95"/>
+  <rect x="70" y="80" width="220" height="540" rx="12" fill="#eef2ff"/>
+  <rect x="320" y="80" width="800" height="120" rx="12" fill="#eff6ff"/>
+  <rect x="320" y="220" width="380" height="180" rx="12" fill="#dbeafe"/>
+  <rect x="740" y="220" width="380" height="180" rx="12" fill="#ffedd5"/>
+  <rect x="320" y="420" width="800" height="200" rx="12" fill="#ecfeff"/>
+  <text x="600" y="355" text-anchor="middle" font-size="32" font-family="Arial" fill="#0f172a">TriadFS Dashboard Overview</text>
+</svg>
