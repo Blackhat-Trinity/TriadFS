@@ -1,0 +1,125 @@
+{
+  "name": "triadfs-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "description": "TriadFS cross-platform desktop explorer and benchmarking client.",
+  "author": "TriadFS Contributors",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "sync:logo": "node scripts/sync-logo.cjs",
+    "desktop:prepare-backend": "node scripts/build-backend-bundle.cjs",
+    "prebuild": "npm run sync:logo",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "desktop:dev": "node electron/dev.cjs",
+    "desktop:build": "npm run desktop:build:win",
+    "desktop:build:win": "npm run build && npm run desktop:prepare-backend && electron-builder --win nsis portable",
+    "desktop:build:mac": "npm run build && npm run desktop:prepare-backend && electron-builder --mac dmg zip",
+    "desktop:build:linux": "npm run build && npm run desktop:prepare-backend && electron-builder --linux AppImage deb",
+    "desktop:build:linux:deb": "npm run build && npm run desktop:prepare-backend && electron-builder --linux deb",
+    "desktop:build:linux:appimage": "npm run build && npm run desktop:prepare-backend && electron-builder --linux AppImage",
+    "desktop:installer": "npm run build && npm run desktop:prepare-backend && electron-builder --win nsis"
+  },
+  "dependencies": {
+    "@radix-ui/react-avatar": "^1.1.1",
+    "@radix-ui/react-context-menu": "^2.2.16",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-dropdown-menu": "^2.1.1",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-scroll-area": "^1.2.0",
+    "@radix-ui/react-select": "^2.1.1",
+    "@radix-ui/react-separator": "^1.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-tabs": "^1.1.0",
+    "@radix-ui/react-tooltip": "^1.1.4",
+    "@tanstack/react-query": "^5.59.0",
+    "axios": "^1.7.7",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.11.11",
+    "lucide-react": "^0.445.0",
+    "next-themes": "^0.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.27.0",
+    "recharts": "^2.12.7",
+    "tailwind-merge": "^2.5.2"
+  },
+  "devDependencies": {
+    "@electron/packager": "^18.4.4",
+    "@types/node": "^22.7.5",
+    "@types/react": "^18.3.9",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.2",
+    "autoprefixer": "^10.4.20",
+    "electron": "^37.3.1",
+    "electron-builder": "^26.0.12",
+    "postcss": "^8.4.47",
+    "rcedit": "^5.0.2",
+    "sharp": "^0.34.5",
+    "tailwindcss": "^3.4.13",
+    "to-ico": "^1.1.5",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8"
+  },
+  "build": {
+    "appId": "com.triadfs.desktop",
+    "productName": "TriadFS",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "build",
+        "to": "build",
+        "filter": [
+          "icon.ico",
+          "icon.png"
+        ]
+      },
+      {
+        "from": "build/backend-bundle",
+        "to": "backend-bundle"
+      }
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "signAndEditExecutable": false,
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "mac": {
+      "icon": "build/icon.png",
+      "category": "public.app-category.productivity",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "category": "Utility",
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "afterPack": "./scripts/electron-builder-after-pack.cjs",
+    "artifactBuildCompleted": "./scripts/electron-builder-artifact.cjs"
+  }
+}
