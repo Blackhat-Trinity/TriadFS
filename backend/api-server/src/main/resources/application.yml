@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: triadfs-api
+  datasource:
+    url: jdbc:postgresql://localhost:5432/triadfs
+    username: triadfs
+    password: triadfs
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+logging:
+  level:
+    root: INFO
+    com.triadfs: INFO
+
+triadfs:
+  storage:
+    local-dir: ./data/chunks
+    lru-size: 256
+  auth:
+    jwt:
+      secret: ${TRIADFS_AUTH_JWT_SECRET_BASE64:dHJpYWRmcy1zdXBlci1zZWNyZXQta2V5LWZvci1qd3QtMjAyNg==}
+      access-ttl-seconds: 3600
