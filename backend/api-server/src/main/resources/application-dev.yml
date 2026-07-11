@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/triadfs
+    username: triadfs
+    password: triadfs
+  jpa:
+    show-sql: true
+logging:
+  level:
+    com.triadfs: DEBUG
