@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:${TRIADFS_DESKTOP_DB_PATH:./data/triadfs-desktop};MODE=PostgreSQL;AUTO_SERVER=TRUE;NON_KEYWORDS=USER,USERS,VALUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.H2Dialect
+  flyway:
+    locations: classpath:db/migration-h2
+
+server:
+  address: 127.0.0.1
+  port: ${TRIADFS_API_PORT:38180}
+
+logging:
+  file:
+    name: ${TRIADFS_LOG_FILE:./logs/triadfs-api.log}
+
+triadfs:
+  storage:
+    local-dir: ${TRIADFS_STORAGE_DIR:./data/chunks}
+  desktop:
+    bootstrap:
+      enabled: ${TRIADFS_DESKTOP_BOOTSTRAP_ENABLED:true}
+      email: ${TRIADFS_DESKTOP_BOOTSTRAP_EMAIL:desktop@local.triadfs}
+      password: ${TRIADFS_DESKTOP_BOOTSTRAP_PASSWORD:triadfs-desktop}
+      display-name: ${TRIADFS_DESKTOP_BOOTSTRAP_DISPLAY_NAME:TriadFS Desktop}
